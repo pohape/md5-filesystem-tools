@@ -1,4 +1,5 @@
 #!/bin/bash
+source functions.sh
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 /path/to/checksums.md5"
@@ -12,18 +13,7 @@ if [ ! -f "$checksums_file" ]; then
   exit 1
 fi
 
-declare -A file_hash_map
-
-while read -r line; do
-  hash=$(echo "$line" | awk '{print $1}')
-  file=$(echo "$line" | cut -d ' ' -f 2-)
-
-  if [[ -n ${file_hash_map[$hash]} ]]; then
-    file_hash_map[$hash]+=$'\n'"$file"
-  else
-    file_hash_map[$hash]=$file
-  fi
-done < "$checksums_file"
+generate_hash_map "$checksums_file"
 
 for hash in "${!file_hash_map[@]}"; do
   files="${file_hash_map[$hash]}"
