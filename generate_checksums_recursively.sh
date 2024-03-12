@@ -9,6 +9,10 @@ fi
 
 find "$root_dir" -type d -print0 | while IFS= read -r -d $'\0' dir; do
   cd "$dir"
-  md5sum * > checksums.md5 2> /dev/null
+  checksums=$(md5sum * 2> /dev/null)
+
+  if [ -n "$checksums" ]; then
+    echo "$checksums" > checksums.md5
+  fi
   cd - > /dev/null
 done
