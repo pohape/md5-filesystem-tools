@@ -27,14 +27,7 @@ for hash in "${!file_hash_map[@]}"; do
 
     for file in "${files[@]}"; do
       if [ "$file" != "$shortest_file" ]; then
-        echo "Removing: $file"
-        rm "$file"
-
-        filename_to_delete=$(basename "$file")
-        escaped_filename_to_delete=$(printf '%s\n' "$filename_to_delete" | sed 's:[][\/.^$*]:\\&:g')
-        temp_file=$(mktemp)
-        grep -v "^$hash  $escaped_filename_to_delete\$" "$checksums_file" > "$temp_file"
-        mv "$temp_file" "$checksums_file"
+        delete_file "$file"
       fi
     done
   fi

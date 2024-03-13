@@ -14,3 +14,18 @@ generate_hash_map() {
         fi
     done < "$checksums_file_path"
 }
+
+delete_file() {
+    local file_path_to_delete=$1
+    echo "Removing: $file_path_to_delete"
+    rm "$file_path_to_delete"
+
+    local basedir=$(dirname "$file_path_to_delete")
+    checksums_file_path="$basedir/checksums.md5"
+
+    local filename_to_delete=$(basename "$file_path_to_delete")
+    local escaped_filename_to_delete=$(printf '%s\n' "$filename_to_delete" | sed 's:[][\/.^$*]:\\&:g')
+    local temp_file=$(mktemp)
+    grep -v "  $escaped_filename_to_delete\$" "$checksums_file_path" > "$temp_file"
+    mv "$temp_file" "$checksums_file_path"
+}
