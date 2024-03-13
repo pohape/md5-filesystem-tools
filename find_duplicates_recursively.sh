@@ -1,5 +1,5 @@
 #!/bin/bash
-source functions.sh
+source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 /path/to/directory"
