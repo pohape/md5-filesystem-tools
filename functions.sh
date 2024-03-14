@@ -1,18 +1,28 @@
-generate_hash_map() {
+generate_hash_string() {
     local checksums_file_path=$1
     local checksums_dir=$(dirname "$checksums_file_path")
-    declare -gA file_hash_map
+    local hash_string=""
+    local previous_hash=""
+    local delimiter="!!__DELIMITER__!!"
 
     while IFS= read -r line; do
         local hash=$(echo "$line" | awk '{print $1}')
         local file=$(echo "$line" | cut -d ' ' -f 2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        file=${file#./}
         local full_path_file="${checksums_dir}/${file}"
-        if [[ -n ${file_hash_map[$hash]} ]]; then
-            file_hash_map[$hash]+=$'\n'"$full_path_file"
+
+        if [[ "$hash" != "$previous_hash" ]]; then
+            if [[ -n "$previous_hash" ]]; then
+                hash_string+=$'\n'  # Добавляем новую строку перед началом нового хеша
+            fi
+            hash_string+="${hash}${delimiter}${full_path_file}"
         else
-            file_hash_map[$hash]=$full_path_file
+            hash_string+="${delimiter}${full_path_file}"
         fi
+        previous_hash="$hash"
     done < "$checksums_file_path"
+
+    echo "$hash_string"
 }
 
 delete_file() {
@@ -44,5 +54,36 @@ process_checksums_file() {
       exit 1
     fi
 
-    generate_hash_map "$input_path"
+    generate_hash_string "$input_path"
+}
+
+remove_duplicates() {
+    local serialized_map=$1
+    local -A deserialized_map
+    IFS=';' read -ra pairs <<< "$serialized_map"
+    for pair in "${pairs[@]}"; do
+        IFS='=' read -r key value <<< "$pair"
+        deserialized_map["$key"]="$value"
+    done
+
+    for hash in "${!deserialized_map[@]}"; do
+        IFS=' ' read -r -a files <<< "${deserialized_map[$hash]}"
+
+        if [ "${#files[@]}" -gt 1 ]; then
+            # Сортировка файлов по длине имени и выбор самого короткого
+            shortest_file=$(printf "%s\n" "${files[@]}" | awk '{print length, $0}' | sort -n | cut -d' ' -f2- | head -n 1)
+            echo "The file with the shortest name will be preserved:"
+            echo "$shortest_file"
+            echo
+
+            # Удаление файлов, которые не являются самым коротким
+            for file in "${files[@]}"; do
+                if [ "$file" != "$shortest_file" ]; then
+                    echo "Removing: $file"
+                    # Вот здесь должен быть вызов функции delete_file или команда удаления
+                    # delete_file "$file"
+                fi
+            done
+        fi
+    done
 }
