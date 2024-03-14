@@ -21,7 +21,7 @@ while IFS= read -r dir; do
   echo "The directory has this amount of files:"
   ls -p | grep -v / | grep -v checksums.md5 | wc -l
   
-  checksums=$(md5sum ./* 2> /dev/null | grep -v "checksums.md5")
+  checksums=$(md5sum * 2> /dev/null | grep -v "checksums.md5")
 
   if [ -n "$checksums" ]; then
     echo "$checksums" > checksums.md5
