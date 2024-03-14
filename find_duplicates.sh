@@ -3,12 +3,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
 process_checksums_file "$1"
 
-for hash in "${!file_hash_map[@]}"; do
-  files="${file_hash_map[$hash]}"
-  if [[ $(grep -c . <<< "$files") -gt 1 ]]; then
-    echo -e "\n$hash:"
-    echo "$files" | while IFS= read -r file; do
-      echo "$file"
-    done
-  fi
-done
+while IFS= read -r item1; do
+    while IFS= read -r item2; do
+        echo $item2
+    done < <(echo "$item1" | awk -v RS='!!__DELIMITER1__!!' '{print $0}')
+done < <(echo "$hash_string" | awk -v RS='!!__DELIMITER2__!!' '{print $0}')
