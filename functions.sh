@@ -113,30 +113,26 @@ find_duplicates_recursively() {
 }
 
 remove_duplicates() {
-    local serialized_map=$1
-    local -A deserialized_map
-    IFS=';' read -ra pairs <<< "$serialized_map"
-    for pair in "${pairs[@]}"; do
-        IFS='=' read -r key value <<< "$pair"
-        deserialized_map["$key"]="$value"
-    done
+    while IFS= read -r item1; do
+        shortest_path=""
+        shortest_len=-1
+        files=()
+        
+        while IFS= read -r item2; do
+            if [[ "$item2" == /* ]]; then
+            files+=("$item2")
+            
+            if [[ $shortest_len -eq -1 || ${#item2} -lt $shortest_len ]]; then
+                shortest_path="$item2"
+                shortest_len=${#item2}
+            fi
+            fi
+        done < <(echo "$item1" | awk -v RS='!!__DELIMITER1__!!' '{print $0}')
 
-    for hash in "${!deserialized_map[@]}"; do
-        IFS=' ' read -r -a files <<< "${deserialized_map[$hash]}"
-
-        if [ "${#files[@]}" -gt 1 ]; then
-            shortest_file=$(printf "%s\n" "${files[@]}" | awk '{print length, $0}' | sort -n | cut -d' ' -f2- | head -n 1)
-            echo "The file with the shortest name will be preserved:"
-            echo "$shortest_file"
-            echo
-
-            for file in "${files[@]}"; do
-                if [ "$file" != "$shortest_file" ]; then
-                    echo "Removing: $file"
-                    # Вот здесь должен быть вызов функции delete_file или команда удаления
-                    # delete_file "$file"
-                fi
-            done
-        fi
-    done
+        for file in "${files[@]}"; do
+            if [[ "$file" != "$shortest_path" ]]; then
+                delete_file "$file"
+            fi
+        done
+    done < <(echo "$1" | awk -v RS='!!__DELIMITER2__!!' '{print $0}')
 }
