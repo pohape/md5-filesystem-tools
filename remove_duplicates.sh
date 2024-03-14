@@ -1,26 +1,7 @@
 #!/bin/bash
 source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 /path/to/checksums.md5"
-    echo "Or: $0 /path/to/"
-    exit 1
-fi
-
-checksums_file="$1"
-
-if [[ "$checksums_file" != *.md5 ]]; then
-    checksums_file="${checksums_file%/}/checksums.md5"
-fi
-
-echo "Checksums file: $checksums_file"
-
-if [ ! -f "$checksums_file" ]; then
-  echo "$checksums_file not found."
-  exit 1
-fi
-
-generate_hash_map "$checksums_file"
+process_checksums_file "$1"
 directory_path=$(dirname "$checksums_file")
 
 for hash in "${!file_hash_map[@]}"; do

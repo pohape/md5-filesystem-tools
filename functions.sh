@@ -29,3 +29,20 @@ delete_file() {
     grep -v "  $escaped_filename_to_delete\$" "$checksums_file_path" > "$temp_file"
     mv "$temp_file" "$checksums_file_path"
 }
+
+process_checksums_file() {
+    local input_path="$1"
+
+    if [[ "$input_path" != *.md5 ]]; then
+        input_path="${input_path%/}/checksums.md5"
+    fi
+
+    echo "Checksums file: $input_path"
+
+    if [ ! -f "$input_path" ]; then
+      echo "$input_path not found."
+      exit 1
+    fi
+
+    generate_hash_map "$input_path"
+}
