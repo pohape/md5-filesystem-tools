@@ -1,7 +1,7 @@
 generate_hash_string() {
     local checksums_file_path=$1
     local checksums_dir=$(dirname "$checksums_file_path")
-    local hash_string=""
+    hash_string=""
     local previous_hash=""
     local delimiter="!!__DELIMITER__!!"
 
@@ -21,8 +21,6 @@ generate_hash_string() {
         fi
         previous_hash="$hash"
     done < "$checksums_file_path"
-
-    echo "$hash_string"
 }
 
 delete_file() {
