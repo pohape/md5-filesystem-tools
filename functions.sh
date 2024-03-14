@@ -3,7 +3,7 @@ generate_hash_string() {
     local checksums_dir=$(dirname "$checksums_file_path")
     hash_string=""
     local previous_hash=""
-    local delimiter="!!__DELIMITER__!!"
+    local delimiter="!!__DELIMITER1__!!"
 
     while IFS= read -r line; do
         local hash=$(echo "$line" | awk '{print $1}')
@@ -13,7 +13,7 @@ generate_hash_string() {
 
         if [[ "$hash" != "$previous_hash" ]]; then
             if [[ -n "$previous_hash" ]]; then
-                hash_string+=$'\n'  # Добавляем новую строку перед началом нового хеша
+                hash_string+=$'!!__DELIMITER2__!!'  # Добавляем новую строку перед началом нового хеша
             fi
             hash_string+="${hash}${delimiter}${full_path_file}"
         else

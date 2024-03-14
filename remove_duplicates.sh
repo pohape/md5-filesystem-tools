@@ -2,21 +2,26 @@
 source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
 process_checksums_file "$1"
-directory_path=$(dirname "$checksums_file")
 
-for hash in "${!file_hash_map[@]}"; do
-  files=()
-  while IFS= read -r file; do
-    files+=("$file")
-  done <<< "${file_hash_map[$hash]}"
-
-  if [ "${#files[@]}" -gt 1 ]; then
-    shortest_file=$(printf "%s\n" "${files[@]}" | awk '{print length, $0}' | sort -n | cut -d' ' -f2- | head -n 1)
+while IFS= read -r item1; do
+    shortest_path=""
+    shortest_len=-1
+    files=()
+    
+    while IFS= read -r item2; do
+        if [[ "$item2" == /* ]]; then
+          files+=("$item2")
+        
+          if [[ $shortest_len -eq -1 || ${#item2} -lt $shortest_len ]]; then
+              shortest_path="$item2"
+              shortest_len=${#item2}
+          fi
+        fi
+    done < <(echo "$item1" | awk -v RS='!!__DELIMITER1__!!' '{print $0}')
 
     for file in "${files[@]}"; do
-      if [ "$file" != "$shortest_file" ]; then
-        delete_file "$file"
-      fi
+        if [[ "$file" != "$shortest_path" ]]; then
+            delete_file "$file"
+        fi
     done
-  fi
-done
+done < <(echo "$hash_string" | awk -v RS='!!__DELIMITER2__!!' '{print $0}')
