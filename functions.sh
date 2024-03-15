@@ -1,5 +1,5 @@
 generate_hash_string() {
-    local checksums_file_path=$1
+    local checksums_file_path=$(realpath "$1")
     local checksums_dir=$(dirname "$checksums_file_path")
     hash_string=""
     local previous_hash=""
@@ -24,7 +24,7 @@ generate_hash_string() {
 }
 
 delete_file() {
-    local file_path_to_delete=$1
+    local file_path_to_delete=$(realpath "$1")
     echo "Removing: $file_path_to_delete"
     rm "$file_path_to_delete"
 
@@ -39,7 +39,7 @@ delete_file() {
 }
 
 process_checksums_file() {
-    local input_path="$1"
+    local input_path=$(realpath "$1")
 
     if [[ "$input_path" != *.md5 ]]; then
         input_path="${input_path%/}/checksums.md5"
@@ -56,7 +56,7 @@ process_checksums_file() {
 }
 
 find_duplicates_recursively() {
-    directory_path="$1"
+    directory_path=$(realpath "$1")
 
     if [ ! -d "$directory_path" ]; then
     echo "$directory_path is not a directory."

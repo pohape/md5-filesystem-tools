@@ -1,6 +1,6 @@
 #!/bin/bash
 
-root_dir=$1
+root_dir=$(realpath "$1")
 
 if [ -z "$root_dir" ]; then
   echo "Usage: $0 <directory>"
