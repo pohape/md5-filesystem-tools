@@ -1,5 +1,13 @@
 #!/bin/bash
 source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
-process_checksums_file "$1"
-remove_duplicates $hash_string
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 /path/to/directory"
+    exit 1
+fi
+
+directory_path="$1"
+echo "Directory Path: $directory_path"
+
+find_duplicates "$directory_path" "non-recursive"
+remove_duplicates "$global_hash_string"
