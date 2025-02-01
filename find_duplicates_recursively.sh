@@ -6,7 +6,9 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-find_duplicates_recursively $1
+directory_path="$1"
+echo "Directory Path: $directory_path"
+find_duplicates_recursively "$directory_path"
 
 echo
 
