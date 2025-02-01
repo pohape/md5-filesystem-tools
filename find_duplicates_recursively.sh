@@ -10,7 +10,7 @@ directory_path="$1"
 echo "Directory Path: $directory_path"
 echo
 
-find_duplicates_recursively "$directory_path"
+find_duplicates "$directory_path"
 echo
 
 duplicates_found=0
