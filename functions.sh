@@ -74,12 +74,12 @@ find_duplicates_recursively() {
     for checksums_file in "${checksum_files[@]}"; do
     echo "Processing $checksums_file"
     generate_hash_string "$checksums_file"
-    
+
     while IFS= read -r item1; do
         shortest_path=""
         shortest_len=-1
         hash=""
-        
+
         while IFS= read -r item2; do
             if [[ "$item2" != /* ]]; then
                 hash="$item2"
@@ -103,7 +103,7 @@ find_duplicates_recursively() {
         fi
 
         global_hash_string+="$hash"
-        
+
         while IFS= read -r file; do
         global_hash_string+="$delimiter1"
         global_hash_string+="$file"
@@ -117,11 +117,11 @@ remove_duplicates() {
         shortest_path=""
         shortest_len=-1
         files=()
-        
+
         while IFS= read -r item2; do
             if [[ "$item2" == /* ]]; then
             files+=("$item2")
-            
+
             if [[ $shortest_len -eq -1 || ${#item2} -lt $shortest_len ]]; then
                 shortest_path="$item2"
                 shortest_len=${#item2}
