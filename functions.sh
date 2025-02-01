@@ -56,11 +56,11 @@ process_checksums_file() {
 }
 
 find_duplicates_recursively() {
-    directory_path=$(realpath "$1")
+    local directory_path="$1"
 
     if [ ! -d "$directory_path" ]; then
-    echo "$directory_path is not a directory."
-    exit 1
+        echo "\"$directory_path\" is not a directory."
+        exit 1
     fi
 
     delimiter1="!!__DELIMITER1__!!"
